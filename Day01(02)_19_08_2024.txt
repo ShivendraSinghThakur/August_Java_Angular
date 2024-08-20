@@ -1,0 +1,178 @@
+https://github.com/prasannatrainer80/Segue8/blob/main/Aug_19_2/Out_Param.txt
+
+Create or replace procedure prcEmpSearchNew
+(
+	eno IN employ.empno%type,
+	nam OUT employ.name%type,
+	dpt OUT employ.dept%type,
+	dsg OUT employ.desig%type,
+	bas OUT employ.basic%type
+)
+as
+begin
+select name, dept, desig, basic into nam, dpt, dsg, bas from Employ
+where empno = eno;
+end;
+
+-------------------------------------------------------------------------------------------------------
+
+Create or replace procedure prcEmpSearchOut
+(
+	eno employ.empno%type
+)
+as 
+BEGIN
+declare 
+	nam employ.name%type;
+	dpt employ.dept%type;
+	dsg employ.desig%type;
+	bas employ.basic%type;
+begin
+prcEmpSearchNew(eno, nam,dpt,dsg, bas);
+dbms_output.put_line('Name ' || nam);
+dbms_output.put_line('Department ' || dpt);
+dbms_output.put_line('Designation ' || dsg);
+dbms_output.put_line('Basic ' || bas);
+end;
+END;
+
+
+-------------------------------------------------------------------------------------------------------
+
+Create or replace procedure prcEmpSal(
+	eno IN employ.empno%type,
+	bas OUT employ.basic%type
+)
+as
+begin
+select basic into bas from Employ where empno = eno;
+END;
+
+-------------------------------------------------------------------------------------------------------
+
+Create or replace procedure prcEmpOut(eno employ.empno%type)
+as
+begin
+declare
+bas employ.basic%type;
+begin
+prcEmpSal(eno,bas);
+dbms_output.put_line('Salary is ' || bas);
+end;
+end;
+
+
+-------------------------------------------------------------------------------------------------------
+
+create or replace procedure prcCommission
+(
+   sal IN employ.basic%type,
+   comm OUT number
+)
+as
+begin
+	if sal >= 10000 AND sal <= 80000 then
+        comm:=15000;
+     end if;
+     if sal > 80000 then
+        comm:=18000;
+     end if;
+end;
+
+-------------------------------------------------------------------------------------------------------
+
+Create or replace procedure prcCommisionOut
+(
+   sal employ.basic%type
+)
+as
+begin
+    declare
+      comm number;
+    begin
+        prcCommission(sal,comm);
+        dbms_output.put_line('Commission is  ' ||comm);
+    end;
+end;
+
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
+
+EXCEPTION HANDLING::
+
+declare 
+a number := &a;
+b number := &b;
+c number;
+
+begin
+c := a/b;
+dbms_output.put_line('Division ' || c);
+exception
+WHEN ZERO_DIVIDE THEN
+dbms_output.put_line('Division by zero impossible...');
+end;
+
+-------------------------------------------------------------------------------------------------------
+
+Create or replace procedure prcDivision(a number, b number)
+as
+begin
+declare
+c number;
+begin 
+c := a/b;
+dbms_output.put_line('Division ' || c);
+end;
+Exception
+WHEN ZERO_DIVIDE THEN
+dbms_output.put_line('Division by zero is impossible...');
+END;
+
+-------------------------------------------------------------------------------------------------------
+
+Create or replace procedure prcEmploySearch(eno employ.empno%type)
+as
+begin
+declare
+nam employ.name%type;
+dpt employ.dept%type;
+dsg employ.desig%type;
+bas employ.basic%type;
+begin
+select Name, Dept, Desig, Basic into Nam, dpt, dsg, bas from Employ where empno = eno;
+dbms_output.put_line('Employ No ' || eno);
+dbms_output.put_line('Employ Name ' || nam);
+dbms_output.put_line('Department ' || dpt);
+dbms_output.put_line('Designation ' || dsg);
+dbms_output.put_line('Basic ' || bas);
+Exception
+WHEN NO_DATA_FOUND THEN
+dbms_output.put_line('Employ No ' || eno || ' Not found...');
+WHEN OTHERS THEN
+dbms_output.put_line('Unknown error');
+end;
+end;
+
+
+-------------------------------------------------------------------------------------------------------
+
+create or replace procedure prcEmployInsert
+( 
+eno employ.empno%type,
+nam employ.name%type,
+dpt employ.dept%type,
+dsg employ.desig%type,
+bas employ.basic%type
+)
+as
+begin
+insert into employ(empno, name,dept,desig,basic) values (eno, nam,dpt,dsg,bas);
+EXCEPTION
+when DUP_VAL_ON_INDEX THEN
+dbms_output.put_line('Employ No Already Exists...' || eno);
+END;
+
+
+-------------------------------------------------------------------------------------------------------
